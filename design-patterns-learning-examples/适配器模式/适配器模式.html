@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // 定义：将一个类（对象）的接口（方法、属性）转化为另一个接口，以满足用户需求，使类（对象）直接使用
+        // 一种是修改原来接口
+        // 当原本接口较复杂时，可以写一个转换器，通过转换器的形式，来适配
+        function doTing(obj) {
+            var _obj = {
+                name: 'xx',
+                title: '设计模式',
+                age: 10,
+                height: 100
+            }
+            for(var i in obj) {
+                _obj[i] = obj[i] || _obj[i];
+            }
+            console.log(_obj)
+        }
+        var myObj = {
+            name: 'myName',
+            age: 30,
+        }
+        doTing(myObj);
+    </script>
+</body>
+</html>

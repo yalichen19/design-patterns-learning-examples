@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // 提供一种方法，将对象的内部显示出来，但并不暴露内部的样子
+        // 特点： 访问一个聚合对象的内容而不暴露这个对象的内部
+        // 遍历不同的结构提供同一个接口，从而支持同样算法在不同的集合结构上进行操作
+        var arr = [1, 2, 3, 4];
+        for (var i = 0; i < arr.length; i ++) {
+            console.log(arr[i]);
+        }
+        var agg = (function () {
+            var data = [1, 2, 3, 4];
+            var length = data.length;
+            var index = 0;
+            return {
+                next: function () {
+                    var result;
+                    if (!this.hasNext()) {
+                        return null;
+                    }
+                    else {  
+                        result = data[index];
+                        index ++;
+                        return result;
+                    }
+                },
+                hasNext: function () {
+                    return index < length;
+                },
+                current: function () {
+                    return data[index];
+                }
+            }
+        })();
+        console.log(agg.current())
+        
+        while(agg.hasNext()) {
+            console.log(agg.next());
+        }
+
+    </script>
+</body>
+</html>

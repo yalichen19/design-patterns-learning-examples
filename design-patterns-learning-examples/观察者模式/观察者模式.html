@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        var observer = (function() {
+            var _message = {};
+            return {
+                register: function (type, fn) {
+                    if(typeof _message[type] === 'undefined') {
+                        _message[type] = [fn];
+                    } else {
+                        _message[type].push(fn);
+                    }
+                },
+                fire: function (type, args) {
+                    if (!_message[type]) {
+                        return;
+                    }
+                    var events = {
+                        type: type,
+                        args: args || {}
+                    };
+                    var len = _message[type].length;
+                    for(var i = 0; i < len; i++) {
+                        _message[type][i].call(this, events);
+                    }
+                },
+                remove: function(type, fn) {
+                    if(_message[type] instanceof Array) {
+                        var i = _message[type].length - 1;
+                        for (; i >= 0; i--) {
+                            _message[type][i] === fn && _message[type].splice(i, 1);
+                        }
+                    }
+                }
+            }
+            
+        })();
+        var fn = function (e) {
+            console.log(e.type, e.args.msg);
+        }
+        observer.register('test', fn)
+        observer.fire('test', {msg: '测试'});
+        observer.remove('test', fn);
+        observer.fire('test', { msg: '测试' });
+        
+    </script>
+</body>
+</html>

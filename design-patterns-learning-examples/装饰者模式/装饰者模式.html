@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // 在不改变原对象的基础上，通过对其进行包装拓展（添加属性、方法）
+        // 是原对象可以满足用户更复杂的需求
+        // 举例：毛坯房相当于源对象 装修一下（包装和扩展）睡觉、娱乐......
+        // 装饰者模式，其实是在一个应用的进行中，对他的特征进行干预，而不是创建时进行干预、
+        // 举例：买电脑，性能不够，加内存条、加驱动器，不是在出厂的时候配齐的
+        function Macbook() {
+            this.cost = function () {
+                return 1000;
+            }
+        }
+        function Memory(computer) {
+            this.cost = function () {
+                return computer.cost() + 100;
+            }
+        }
+
+        function BlurayDrive(computer) {
+            this.cost = function () {
+                return computer.cost() + 200;
+            }
+        }
+
+        function Insurance(computer) {
+            this.cost = function () {
+                return computer.cost() + 300;
+            }
+        }
+
+        var myComputer = new Insurance(new BlurayDrive(new Memory(new Macbook()))).cost();
+        console.log(myComputer);
+
+        
+    </script>
+</body>
+</html>
