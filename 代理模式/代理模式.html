@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // 定义：为一个对象提供一个代用品或占位符，以便控制对他的访问。
+        // 本质是保护和中介，如输入校验
+
+        // var Flower = function(name) {
+        //     var flowers = {
+        //         flower: name
+        //     };
+        //     return flowers;
+        // }
+
+        // var dg = {
+        //     sendFlower: function(target) {
+        //         var flowers = new Flower('向日葵');
+        //         target.receiveFlower(flowers.flower);
+        //     }
+        // }
+
+        // var goddness1 = {
+        //     receiveFlower: function (flower) {
+        //         console.log('收到：' + flower);
+        //     }
+        // }
+        // dg.sendFlower(goddness1);
+
+        // 通过成哥给女神送花
+        // var Flower = function(name) {
+        //     var flowers = {
+        //         flower: name
+        //     };
+        //     return flowers;
+        // }
+
+        // var dg = {
+        //     sendFlower: function(target) {
+        //         var flowers = new Flower('向日葵');
+        //         target.receiveFlower(flowers.flower);
+        //     }
+        // }
+
+        // var goddness2 = {
+        //     receiveFlower: function (flower) {
+        //         console.log('女神2收到：' + flower);
+        //     }
+        // }
+
+        // var cg = {
+        //     receiveFlower: function (flower) {
+        //         goddness2.receiveFlower(flower);
+        //     }
+        // } 
+        
+        // dg.sendFlower(cg);
+        
+
+        // 成哥只是一个转送者这个模式就没有什么优势，但由成哥来创建对象，可减少开销
+        //  把开销大的过程等到真正需要的时候再创建
+        var Flower = function(name) {
+            var flowers = {
+                flower: name
+            };
+            return flowers;
+        }
+
+        var dg = {
+            sendFlower: function(target) {
+                target.receiveFlower();
+            }
+        }
+
+        var goddness3 = {
+            receiveFlower: function (flower) {
+                console.log('女神3收到：' + flower);
+            },
+            listenGoodMoods: function (fn) {
+                setTimeout(fn, 2000);
+            }
+        }
+
+        var cg = {
+            receiveFlower: function () {
+                var flowers = new Flower('向日葵');
+                goddness3.listenGoodMoods(function() {
+                    goddness3.receiveFlower(flowers.flower);
+                })
+            }
+        } 
+        
+        dg.sendFlower(cg);
+    </script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <button id='alertBtn'>click me</button>
+    <button id='showIframe'>click me</button>
+    <script>
+        // 创建时，就会生成一个dom，并插入页面当中
+        // var alert = (function() {
+        //     var div = document.createElement('div');
+        //     div.innerHTML = '我是一个弹窗';
+        //     div.style.display = 'none';
+        //     document.body.appendChild(div);
+        //     return div;
+        // })();
+
+        // document.getElementById('alertBtn').onclick = function () {
+        //     alert.style.display = 'block';
+        // }
+
+        // 点击时，才创建dom，并插入页面
+        // var alert = function() {
+        //     var div = document.createElement('div');
+        //     div.innerHTML = '我是一个弹窗';
+        //     div.style.display = 'none';
+        //     document.body.appendChild(div);
+        //     return div;
+        // };
+
+        // document.getElementById('alertBtn').onclick = function () {
+        //     var createdElement = alert();
+        //     createdElement.style.display = 'block';
+        // }
+
+        // var alert = (function() {
+        //     var div;
+        //     return function() {
+        //         if (!div) {
+        //             div = document.createElement('div');
+        //             div.innerHTML = '我是一个弹窗';
+        //             div.style.display = 'none';
+        //             document.body.appendChild(div);
+        //         }
+        //         return div;
+        //     }
+        // })();
+
+        // document.getElementById('alertBtn').onclick = function () {
+        //     var createdElement = alert();
+        //     createdElement.style.display = 'block';
+        // }
+
+        // 上述实现违反了单一功能原则，不易扩展
+        // 创建逻辑与管理逻辑应相互分离
+
+        var getSingle = function (fn) {
+            var result;
+            return function() {
+                if (!result) {
+                    result = fn.apply(this, arguments);
+                }
+                return result;
+            }
+        }
+
+        var createAlert = function () {
+            div = document.createElement('div');
+            div.innerHTML = '我是一个弹窗';
+            document.body.appendChild(div);
+            return div;
+        }
+        var createIframe = function () {
+            iframe = document.createElement('iframe');
+            document.body.appendChild(iframe);
+            return iframe;
+        }
+        var createSingleAlert = getSingle(createAlert);
+        var createSingleIframe = getSingle(createIframe);
+
+        document.getElementById('alertBtn').onclick = function () {
+            var createdElement = createSingleAlert();
+        }
+        document.getElementById('showIframe').onclick = function () {
+            var createdElement = createSingleIframe();
+        }
+    </script>
+</body>
+</html>
