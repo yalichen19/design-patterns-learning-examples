@@ -51,7 +51,7 @@ game.init = function () {
 
     // 初始化蛇
     var gameSnake = new Snake();
-    gameSnake.init();
+    gameSnake.init(gameGround);
     this.snake = gameSnake;
 };
 game.run = function () {
@@ -74,7 +74,7 @@ ground.basePointY = BASE_Y;
 ground.view = null;
 ground.init = function () {
     var viewGround = document.createElement('div');
-
+    this.view = viewGround;
     viewGround.style.position = 'relative';
     viewGround.style.width = this.xLen * SQUARE_WIDTH + 'px';
     viewGround.style.height = this.yLen * SQUARE_WIDTH + 'px';
@@ -98,6 +98,15 @@ ground.init = function () {
             viewGround.appendChild(square.view);
         }
     }
+}
+ground.remove = function (x, y) {
+    this.view.removeChild(this.squareTable[y][x].view);
+    this.squareTable[y][x] = null;
+}
+
+ground.append = function (x, y, square) {
+    this.squareTable[y][x] = square;
+    this.view.appendChild(this.squareTable[y][x].view);
 }
 
 function SquareFactory(){};
@@ -145,13 +154,53 @@ SquareFactory.Wall = function (x1, y1) {
 }
 SquareFactory.SnakeHead = function (x1, y1) {
     var snakeHead = new SnakeHead();
-    this.commonInit(wall, x1, y1, "red", TouchEvent.DEAD);
+    this.commonInit(snakeHead, x1, y1, "red", TouchEvent.DEAD);
     return snakeHead;
 }
 SquareFactory.SnakeBody = function (x1, y1) {
     var snakeBody = new SnakeBody();
-    this.commonInit(wall, x1, y1, "blue", TouchEvent.MOVE);
+    this.commonInit(snakeBody, x1, y1, "blue", TouchEvent.MOVE);
     return snakeBody;
 }
 
 
+var snake = new Snake();
+snake.head = null;
+snake.tail = null;
+snake.direction = 0;
+
+var DirectionEnum = {
+    UP: {x: 0, y: -1},
+    DOWN: {x: 0, y: 1},
+    LEFT: {x: -1, y: 0},
+    RIGHT: {x: 1, y: 0}
+}
+snake.init = function(gameGround) {
+    var tempHead = SquareFactory.create('SnakeHead', 3, 1);
+    var tempBody1 = SquareFactory.create('SnakeBody', 2, 1);
+    var tempBody2 = SquareFactory.create('SnakeBody', 1, 1);
+
+    gameGround.remove(3, 1);
+    gameGround.append(3, 1, tempHead);
+    gameGround.remove(2, 1);
+    gameGround.append(2, 1, tempBody1);
+    gameGround.remove(1, 1);
+    gameGround.append(1, 1, tempBody2);
+
+    tempHead.next = tempBody1;
+    tempHead.last = null;
+    tempBody1.next = tempBody2;
+    tempBody1.last = tempHead;
+    tempBody2.next = null;
+    tempBody2.last = tempBody1;
+
+    this.head = tempHead;
+    this.tail = tempBody2;
+
+    this.direction = DirectionEnum.RIGHT;
+}
+
+snake.move = function (game) {
+
+
+}
