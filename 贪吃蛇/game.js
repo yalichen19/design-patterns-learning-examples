@@ -20,6 +20,7 @@ function Square(x1, y1) {
 }
 
 var Floor = utils.extends(Square);
+var Food = utils.extends(Square);
 var Stone = utils.extends(Square);
 var Wall = utils.extends(Stone);
 var SnakeBody = utils.extends(Square);
@@ -30,10 +31,10 @@ var Ground = utils.Singleton();
 var Game = utils.Singleton();
 
 
-const touchEvent = {
-    MOVE: 'move',
-    EAT: 'eat',
-    DEAD: 'dead'
+const TouchEvent = {
+    MOVE: 'Move',
+    EAT: 'Eat',
+    DEAD: 'Dead'
 }
 
 var game = new Game();
@@ -56,11 +57,25 @@ game.init = function () {
 };
 game.run = function () {
     this.timer = setInterval(function () {
-        var result = game.snake.move(game);
-    }, SPEED)
+        var result = game.snake.move(game);  
+    }, SPEED);
+    document.onkeydown = function (e) {
+        var keyNum = window.event ? e.keyCode : e.which;
+        if (keyNum === 37 && game.snake.direction !== DirectionEnum.RIGHT) {
+            game.snake.direction = DirectionEnum.LEFT;
+        } else if (keyNum === 38 && game.snake.direction !== DirectionEnum.DOWN) {
+            game.snake.direction = DirectionEnum.UP;
+        } else if (keyNum === 39 && game.snake.direction !== DirectionEnum.LEFT) {
+            game.snake.direction = DirectionEnum.RIGHT;
+        } else if (keyNum === 40 && game.snake.direction !== DirectionEnum.UP) {
+            game.snake.direction = DirectionEnum.DOWN;
+        }
+    }
+    var result = game.snake.move(game); 
+
 };
 game.over = function () {
-
+    alert('游戏结束，得分为：' + this.scroe);
 }
 
 var ground = new Ground ();
@@ -201,6 +216,48 @@ snake.init = function(gameGround) {
 }
 
 snake.move = function (game) {
+    const square = game.ground.squareTable[this.head.x + this.direction.x][this.head.y + this.direction.y];
+    if (typeof this.strategy[square.touch()] === 'function') {
+        this.strategy[square.touch()](game, this, false);
+    }
+}
 
+snake.strategy = {
+    Move: function(game, snake, fromEat) {
+        const gameGround = game.ground;
+        const head = snake.head;
+        const tail = snake.tail;
+        const direction = snake.direction;
 
+        const tempHead = SquareFactory.create('SnakeHead', head.x + direction.x, head.y + direction.y);
+        gameGround.remove(tempHead.x, tempHead.y);
+        gameGround.append(tempHead.x, tempHead.y, tempHead);
+        const tempBody = SquareFactory.create('SnakeBody', head.x, head.y);
+        gameGround.remove(tempBody.x, tempBody.y);
+        gameGround.append(tempBody.x, tempBody.y, tempBody);
+           
+        tempBody.next = head.next;
+        head.next.last = tempBody; 
+        tempHead.next = tempBody;
+        tempBody.last = tempHead;   
+        snake.head = tempHead;   
+        
+        if(!fromEat) {
+            const tempFloor = SquareFactory.create('Floor', tail.x, tail.y);
+            gameGround.remove(tempFloor.x, tempFloor.y);
+            gameGround.append(tempFloor.x, tempFloor.y, tempFloor);
+            tail.last.next = null;
+            snake.tail = tail.last;
+        }
+        
+    },
+    Eat: function(game, snake) {
+        this.scroe ++;
+        this.move(game, snake, true);
+        const food = new Food();
+        food.init();
+    },
+    Dead: function(game) {
+        game.over();
+    }
 }
