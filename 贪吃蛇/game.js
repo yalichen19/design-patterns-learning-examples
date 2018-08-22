@@ -1,3 +1,13 @@
+
+/**
+ * 整理思路：首先总结功能：贪吃蛇可以移动，可以吃食物，可以撞墙（死），这些都是碰撞的结果
+ * 移动是碰撞到普通地板，食物是碰撞到食物，撞墙是碰撞到墙。
+ * 因此目前应该有对象：贪吃蛇、食物、普通地板、墙 这几个对象
+ * 对于贪吃蛇的移动，实际是控制头部的移动，身体跟随头部移动，因此贪吃蛇需要拆出蛇头和蛇身，两个方法
+ * 
+ *
+ */
+
 // 棋盘的宽度和高度
 const X_LEN = 30;
 const Y_LEN = 30;
@@ -20,7 +30,6 @@ function Square(x1, y1) {
 }
 
 var Floor = utils.extends(Square);
-var Food = utils.extends(Square);
 var Stone = utils.extends(Square);
 var Wall = utils.extends(Stone);
 var SnakeBody = utils.extends(Square);
@@ -29,6 +38,7 @@ var SnakeHead = utils.extends(Square);
 var Snake = utils.Singleton();
 var Ground = utils.Singleton();
 var Game = utils.Singleton();
+var Food = utils.Singleton();
 
 
 const TouchEvent = {
@@ -54,6 +64,10 @@ game.init = function () {
     var gameSnake = new Snake();
     gameSnake.init(gameGround);
     this.snake = gameSnake;
+
+    var food = new Food();
+    console.log(food)
+    food.init(game, gameGround);
 };
 game.run = function () {
     this.timer = setInterval(function () {
@@ -147,6 +161,7 @@ SquareFactory.commonInit = function (obj, x1, y1, color, touchEvent) {
     obj.touch = function () {
         return touchEvent;
     }
+    obj.touchName = touchEvent;
 
 }
 // 需要这个工厂来创建floor food wall snake snakeHead snakeBody
@@ -217,6 +232,7 @@ snake.init = function(gameGround) {
 
 snake.move = function (game) {
     const square = game.ground.squareTable[this.head.x + this.direction.x][this.head.y + this.direction.y];
+    console.log(square);
     if (typeof this.strategy[square.touch()] === 'function') {
         this.strategy[square.touch()](game, this, false);
     }
@@ -260,4 +276,43 @@ snake.strategy = {
     Dead: function(game) {
         game.over();
     }
+}
+
+var food = new Food();
+food.init = function (game, gameGround) {
+    const foodPositon = this.getValidPositon(game);
+    const food = SquareFactory.create('Food', foodPositon.x, foodPositon.y);
+
+    gameGround.remove(foodPositon.x, foodPositon.y);
+    gameGround.append(foodPositon.x, foodPositon.y, food);
+}
+
+food.getValidPositon = function (game) {
+    let tempPosition = this.getTempPosition();
+    while(!this.checkPostion(game, tempPosition)) {
+        tempPosition = this.getTempPosition();
+    }
+    return tempPosition;
+}
+
+food.getMathRandom = function () {
+    return Math.floor(Math.random() * 29 + 1);
+}
+
+food.getTempPosition = function () {
+    return {
+        x: this.getMathRandom(),
+        y: this.getMathRandom(),
+    }
+}
+
+food.checkPostion = function (game, position) {
+    let current = game.snake.head;
+    while(current.next) {
+        if (current.x === position.x && current.y === position.y) {
+            return false;
+        }
+        current = current.next;
+    }
+    return true;
 }
